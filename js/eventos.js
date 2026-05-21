@@ -99,6 +99,8 @@ function carregarEventos() {
                     <div class="evento-descricao-resumida">
                         ${escapeHtml(desc).substring(0, 100)}${desc.length > 100 ? '...' : ''}
                     </div>
+                    <div class="evento-horario">📆 ${escapeHtml(evento.dataInicio || dataFormatada)} até ${escapeHtml(evento.dataFim || dataFormatada)}</div>
+                    <div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-secondary btn-editar" data-id="${evento.id}">✏️ Editar</button><button class="btn btn-danger btn-excluir" data-id="${evento.id}">🗑️ Excluir</button></div>
                 </div>
             `;
         });
@@ -117,12 +119,12 @@ function carregarEventos() {
 
                 if (!evento) return;
 
-                const dataFormatadaEvento =
+                const dataFormatada =
                     `${String(dia).padStart(2,'0')}/${String(mes + 1).padStart(2,'0')}/${ano}`;
 
                 abrirModal({
                     titulo: evento.titulo,
-                    data: dataFormatadaEvento,
+                    data: dataFormatada,
                     horario: evento.horario,
                     tipo: tipoMap[evento.tipo] || '🎭 Cultural',
                     descricao: evento.descricao,
@@ -131,6 +133,9 @@ function carregarEventos() {
                 });
             });
         });
+
+        document.querySelectorAll('.btn-editar').forEach(btn=>{btn.addEventListener('click',(ev)=>{ev.stopPropagation();const id=btn.dataset.id;const evento=eventosOrdenados.find(e=>String(e.id)===String(id));if(!evento)return;localStorage.setItem('eventoEditando',JSON.stringify(evento));localStorage.setItem('dataSelecionada',JSON.stringify({ano:evento.ano,mes:evento.mes,dia:evento.dia,id:evento.id}));window.location.href='formulario.html';});});
+        document.querySelectorAll('.btn-excluir').forEach(btn=>{btn.addEventListener('click',(ev)=>{ev.stopPropagation();const id=btn.dataset.id;if(!confirm('Deseja realmente excluir este evento?')) return;const all=JSON.parse(localStorage.getItem('todosEventos')||'{}');const key=`${ano}_${mes}_${dia}`;all[key]=(all[key]||[]).filter(e=>String(e.id)!==String(id));localStorage.setItem('todosEventos',JSON.stringify(all));carregarEventos();});});
 
     } catch (e) {
         console.error('Erro ao carregar eventos:', e);

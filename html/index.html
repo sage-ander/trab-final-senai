@@ -6,12 +6,32 @@
     <title>Calendário Cultural da Unidade</title>
     
     <!-- CSS externo -->
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="../css/index.css">
 </head>
 <body>
 
 <div class="container">
     <h1>📅 Calendário Cultural da Cidade</h1>
+
+    <div style="text-align:right; margin-bottom:10px;"><button id="logoutBtn" class="btn-registrar" style="padding:0.5rem 1rem;">Sair</button></div>
+
+    <section class="carousel-wrapper">
+      <div class="carousel" id="eventCarousel">
+        <div class="carousel-slide active">
+          <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Igreja de São João del-Rei">
+          <h3>Festival de Inverno</h3><p>Programação cultural no centro histórico.</p>
+        </div>
+        <div class="carousel-slide">
+          <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Evento em São João del-Rei">
+          <h3>Sarau na Praça</h3><p>Música e poesia ao ar livre.</p>
+        </div>
+        <div class="carousel-slide">
+          <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Evento noturno">
+          <h3>Noite Cultural</h3><p>Artes, feira e gastronomia local.</p>
+        </div>
+      </div>
+      <div class="carousel-controls"><button id="prevSlide">◀</button><button id="nextSlide">▶</button></div>
+    </section>
 
     <div class="controls">
         <div class="control-group">
@@ -70,7 +90,7 @@
     </footer>
 </div>
 
-<script src="script.js"></script>
+<script src="../js/script.js"></script>
 
 </body>
 </html>

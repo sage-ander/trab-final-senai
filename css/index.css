@@ -363,3 +363,4 @@ h2 {
         word-break: break-word;
     }
 }
+.carousel-wrapper{max-width:760px;margin:0 auto 1.5rem;text-align:center}.carousel{position:relative}.carousel-slide{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px}.carousel-slide.active{display:block}.carousel-slide img{width:100%;max-height:280px;object-fit:cover;border-radius:12px}.carousel-controls{display:flex;justify-content:center;gap:8px;margin-top:8px}.carousel-controls button{border:none;background:#e26d5c;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer}

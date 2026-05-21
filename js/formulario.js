@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const descricaoTextarea = document.getElementById('descricao');
     const linkIngressosInput = document.getElementById('linkIngressos');
     const dataEventoInput = document.getElementById('dataEvento');
+    const dataInicioInput = document.getElementById('dataInicio');
+    const dataFimInput = document.getElementById('dataFim');
+    const erroDataFim = document.getElementById('errorDataFim');
     const erroTitulo = document.getElementById('errorTitulo');
     const erroLink = document.getElementById('errorLink');
     const btnVoltar = document.getElementById('btnVoltar');
@@ -154,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // ========== FUNÇÃO PARA SALVAR NO LOCALSTORAGE (FORMATO CONSISTENTE) ==========
-    function salvarEventoNoLocalStorage(evento) {
+    function salvarEventoNoLocalStorage(evento, editCtx=null) {
         // Recuperar eventos existentes no formato do calendário
         let todosEventos = localStorage.getItem('todosEventos');
         let eventosObj = todosEventos ? JSON.parse(todosEventos) : {};
@@ -163,13 +166,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const chave = `${evento.ano}_${evento.mes}_${evento.dia}`;
         
         // Adicionar ID único ao evento
-        evento.id = Date.now();
+        if(!evento.id) evento.id = Date.now();
         
         // Se já existem eventos para esta data, adicionar à lista
         if (!eventosObj[chave]) {
             eventosObj[chave] = [];
         }
         
+        if(editCtx){const antiga=`${editCtx.ano}_${editCtx.mes}_${editCtx.dia}`;eventosObj[antiga]=(eventosObj[antiga]||[]).filter(e=>String(e.id)!==String(editCtx.id));}
         eventosObj[chave].push(evento);
         
         // Salvar de volta no localStorage
@@ -205,6 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     preencherData();
+    const editData=JSON.parse(localStorage.getItem('eventoEditando')||'null');
+    if(editData){ if(tituloInput) tituloInput.value=editData.titulo||''; if(tipoEventoSelect) tipoEventoSelect.value=editData.tipo||'cultural'; if(horarioInput) horarioInput.value=editData.horario||''; if(descricaoTextarea) descricaoTextarea.value=editData.descricao||''; if(linkIngressosInput) linkIngressosInput.value=editData.linkIngressos||''; if(dataInicioInput) dataInicioInput.value=editData.dataInicio||''; if(dataFimInput) dataFimInput.value=editData.dataFim||''; }
     
     // ========== SUBMISSÃO DO FORMULÁRIO ==========
     if (form) {
@@ -236,6 +242,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (linkIngressosInput) linkIngressosInput.style.borderColor = '#e2e8f0';
             }
             
+            if(dataInicioInput && !dataInicioInput.value){valid=false;}
+            if(dataFimInput && !dataFimInput.value){valid=false;}
+            if(dataInicioInput && dataFimInput && dataFimInput.value < dataInicioInput.value){if(erroDataFim) erroDataFim.style.display='block'; valid=false;} else if(erroDataFim){erroDataFim.style.display='none';}
             if (!valid) {
                 console.log('Validação falhou');
                 return;
@@ -281,15 +290,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 linkIngressos: linkIngressos || '',
                 imagemUrl: imagemAtual || '',
                 horario: horario,
-                dataCriacao: new Date().toISOString()
+                dataCriacao: new Date().toISOString(),
+                dataInicio: dataInicioInput ? dataInicioInput.value : '',
+                dataFim: dataFimInput ? dataFimInput.value : ''
             };
             
             console.log('Evento a ser salvo:', evento);
             
             // Salvar no localStorage
-            const novoId = salvarEventoNoLocalStorage(evento);
+            const editCtx=JSON.parse(localStorage.getItem('eventoEditando')||'null');
+            const novoId = salvarEventoNoLocalStorage(evento, editCtx);
             
-            alert(`✅ Evento "${titulo}" registrado com sucesso!`);
+            localStorage.removeItem('eventoEditando');
+            alert(`✅ Evento "${titulo}" salvo com sucesso!`);
             
             // Salvar a data selecionada para voltar ao dia correto
             localStorage.setItem('dataSelecionada', JSON.stringify({ ano, mes, dia }));

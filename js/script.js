@@ -16,6 +16,8 @@ const nomesMeses = [
 ];
 
 function init() {
+    const user=JSON.parse(localStorage.getItem('usuarioLogado')||'null');
+    if(!user){ window.location.href='login.html'; return; }
 
     // EVENTOS DE TESTE - remover depois
     if (!localStorage.getItem('todosEventos')) {
@@ -57,6 +59,10 @@ function init() {
         renderizarCalendario();
         carregarProximosEventos();
     });
+
+    document.getElementById('logoutBtn')?.addEventListener('click',()=>{localStorage.removeItem('usuarioLogado');window.location.href='login.html';});
+
+    iniciarCarrossel();
 
     document.getElementById('registrarEventoBtn')
         ?.addEventListener('click', () => {
@@ -346,3 +352,4 @@ window.addEventListener('pageshow', () => {
     renderizarCalendario();
     carregarProximosEventos();
 });
+function iniciarCarrossel(){const slides=[...document.querySelectorAll('.carousel-slide')];if(!slides.length)return;let i=0;const show=n=>slides.forEach((s,idx)=>s.classList.toggle('active',idx===n));document.getElementById('nextSlide')?.addEventListener('click',()=>{i=(i+1)%slides.length;show(i)});document.getElementById('prevSlide')?.addEventListener('click',()=>{i=(i-1+slides.length)%slides.length;show(i)});setInterval(()=>{i=(i+1)%slides.length;show(i)},4000);}

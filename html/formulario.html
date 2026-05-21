@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Novo Evento</title>
-    <link rel="stylesheet" href="formulario.css">
+    <link rel="stylesheet" href="../css/formulario.css">
 </head>
 <body>
     <div class="container">
@@ -61,7 +61,20 @@
                             <div class="error-message" id="errorLink">Insira uma URL válida</div>
                         </div>
                         
-                        <!-- Data -->
+                        <!-- Data de início -->
+                        <div class="form-group">
+                            <label class="required">📅 Data de início</label>
+                            <input type="date" id="dataInicio" class="form-control" required>
+                        </div>
+
+                        <!-- Data de término -->
+                        <div class="form-group">
+                            <label class="required">📅 Data de término</label>
+                            <input type="date" id="dataFim" class="form-control" required>
+                            <div class="error-message" id="errorDataFim">A data de término não pode ser menor que a data de início</div>
+                        </div>
+
+<!-- Data -->
                         <div class="form-group">
                             <label>📅 Data do Evento</label>
                             <input type="date" id="dataEvento" class="form-control">
@@ -100,6 +113,6 @@
         </div>
     </div>
     
-    <script src="formulario.js?v=3"></script>
+    <script src="../js/formulario.js?v=3"></script>
 </body>
 </html>
