@@ -23,7 +23,7 @@
                         <div class="form-group">
                             <label class="required">📌 Título do Evento</label>
                             <input type="text" id="titulo" class="form-control" placeholder="Ex: Sarau de Poesias, Festival" required>
-                            <div class="error-message" id="errorTitulo">O título é obrigatório</div>
+                            
                         </div>
                         
                         <!-- Tipo -->
@@ -58,7 +58,7 @@
                         <div class="form-group">
                             <label>🎟️ Link para Compra de Ingressos</label>
                             <input type="url" id="linkIngressos" class="form-control" placeholder="https://...">
-                            <div class="error-message" id="errorLink">Insira uma URL válida</div>
+                            
                         </div>
                         
                         <!-- Data de início -->
@@ -81,24 +81,6 @@
                             <small style="color: #666;">Selecione a data do evento. Se não escolher, usará a data atual.</small>
                         </div>
                         
-                        <!-- Imagem com Drag and Drop -->
-                        <div class="form-group">
-                            <label>🖼️ Imagem / Folder de Divulgação</label>
-                            <div id="dropArea" class="drop-area">
-                                <p>📸 Arraste e solte uma imagem aqui ou clique para selecionar</p>
-                                <input type="file" id="imagem" accept="image/*" style="display: none;">
-                                <button type="button" id="btnProcurar" class="btn btn-secondary">Procurar...</button>
-                                <span id="nomeArquivo" style="margin-left: 10px;">Nenhum arquivo selecionado.</span>
-                            </div>
-                            <div id="previewContainer" class="image-preview">
-                                <img id="previewImg" src="" alt="Pré-visualização">
-                                <div class="image-preview-buttons">
-                                    <button type="button" id="btnAlterar" class="btn btn-secondary">🔄 Alterar imagem</button>
-                                    <button type="button" id="btnRemover" class="btn btn-danger">🗑️ Remover imagem</button>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- Botões -->
                         <div class="form-buttons">
                             <button type="submit" class="btn btn-primary">💾 Salvar Evento</button>
@@ -113,6 +95,6 @@
         </div>
     </div>
     
-    <script src="../js/formulario.js?v=3"></script>
+    <script src="../js/formulario.js"></script>
 </body>
 </html>
