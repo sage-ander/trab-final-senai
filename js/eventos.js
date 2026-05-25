@@ -1,265 +1,194 @@
-// ============================================================
-//                        EVENTOS.JS 
-// ============================================================
+const tipoMap = {
+  cultural: '🎭 Cultural',
+  show: '🎤 Show/Música',
+  teatro: '🎪 Teatro/Dança',
+  oficina: '📚 Oficina/Workshop',
+  exposicao: '🖼️ Exposição/Museu',
+  festival: '🎉 Festival/Feira',
+  palestra: '🎓 Palestra/Debate',
+  outro: '✨ Outro'
+};
 
-function carregarEventos() {
+const formatarData = data => {
+  if (!data) return '';
 
-    const eventosData = localStorage.getItem('eventosSelecionados');
+  if (data.includes('-')) {
+    const partes = data.split('-');
 
-    const container = document.getElementById('eventosContainer');
-    const dataInfo = document.getElementById('dataInfo');
-
-    if (!container || !dataInfo) return;
-
-    if (!eventosData) {
-        container.innerHTML = `
-            <div class="sem-eventos">
-                <p>📭 Nenhum evento selecionado.</p>
-                <p style="margin-top: 1rem;">
-                    Volte ao calendário e clique em um evento para ver os detalhes.
-                </p>
-            </div>
-        `;
-        dataInfo.innerHTML = '📅 Nenhum evento carregado';
-        return;
+    if (partes[0].length === 4) {
+      const [ano, mes, dia] = partes;
+      return `${dia}-${mes}-${ano}`;
     }
 
-    try {
-        const { ano, mes, dia } = JSON.parse(eventosData);
+    const [dia, mes, ano] = partes;
+    return `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${ano}`;
+  }
 
-        const todosEventosStorage = localStorage.getItem('todosEventos');
-        let eventosAtualizados = [];
+  if (data.includes('/')) {
+    const [dia, mes, ano] = data.split('/');
+    return `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${ano}`;
+  }
 
-        if (todosEventosStorage) {
-            const todosEventos = JSON.parse(todosEventosStorage);
-            const chave = `${ano}_${mes}_${dia}`;
+  return data;
+};
+const dataParaComparacao = data => {
+  if (!data) return '';
 
-            eventosAtualizados = todosEventos[chave] || [];
-        }
+  if (data.includes('-')) {
+    const partes = data.split('-');
 
-        const nomesMeses = [
-            "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-            "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"
-        ];
+    if (partes[0].length === 4) return data;
 
-        const dataFormatada =
-            `${String(dia).padStart(2,'0')}/${String(mes + 1).padStart(2,'0')}/${ano}`;
+    const [dia, mes, ano] = partes;
+    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+  }
 
-        dataInfo.innerHTML = `📅 ${dataFormatada} - ${nomesMeses[mes]}`;
+  if (data.includes('/')) {
+    const [dia, mes, ano] = data.split('/');
+    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
+  }
 
-        if (!eventosAtualizados.length) {
+  return data;
+};
 
-            container.innerHTML = `
-                <div class="sem-eventos">
-                    <p>📭 Nenhum evento registrado para esta data.</p>
+const dataSel = JSON.parse(localStorage.getItem('eventosSelecionados') || 'null');
+const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+const isAdmin = usuarioLogado?.u === 'admin' && usuarioLogado?.r === 'admin';
+document.body.classList.toggle('perfil-admin', isAdmin);
+const removerEventoDeTodasAsDatas = (todos, id) => {
+  Object.keys(todos).forEach(chave => {
+    todos[chave] = (todos[chave] || []).filter(x => String(x.id) !== String(id));
 
-                    <button id="btnRegistrarAqui" class="btn-registrar" style="margin-top: 1rem;">
-                        📝 Registrar Evento
-                    </button>
-                </div>
-            `;
-
-            document.getElementById('btnRegistrarAqui')?.addEventListener('click', () => {
-                localStorage.setItem('dataSelecionada', JSON.stringify({ ano, mes, dia }));
-                window.location.href = 'formulario.html';
-            });
-
-            return;
-        }
-
-        // 🔥 salva apenas para navegação (não é fonte de verdade)
-        localStorage.setItem('dataSelecionada', JSON.stringify({ ano, mes, dia }));
-
-        const tipoMap = {
-            cultural: '🎭 Cultural',
-            show: '🎤 Show/Música',
-            teatro: '🎪 Teatro/Dança',
-            oficina: '📚 Oficina/Workshop',
-            exposicao: '🖼️ Exposição/Museu',
-            festival: '🎉 Festival/Feira',
-            palestra: '🎓 Palestra/Debate',
-            outro: '✨ Outro'
-        };
-
-        const eventosOrdenados = [...eventosAtualizados].sort((a, b) =>
-            (a.horario || '00:00').localeCompare(b.horario || '00:00')
-        );
-
-        let html = '';
-
-        eventosOrdenados.forEach(evento => {
-
-            const desc = evento.descricao || '';
-
-            html += `
-                <div class="evento-card" data-id="${evento.id}">
-                    <div class="evento-titulo">${escapeHtml(evento.titulo)}</div>
-                    <div class="evento-tipo">${tipoMap[evento.tipo] || '🎭 Cultural'}</div>
-                    <div class="evento-horario">⏰ ${escapeHtml(evento.horario || 'Horário não definido')}</div>
-                    <div class="evento-descricao-resumida">
-                        ${escapeHtml(desc).substring(0, 100)}${desc.length > 100 ? '...' : ''}
-                    </div>
-                    <div class="evento-horario">📆 ${escapeHtml(evento.dataInicio || dataFormatada)} até ${escapeHtml(evento.dataFim || dataFormatada)}</div>
-                    <div style="margin-top:8px;display:flex;gap:8px;"><button class="btn btn-secondary btn-editar" data-id="${evento.id}">✏️ Editar</button><button class="btn btn-danger btn-excluir" data-id="${evento.id}">🗑️ Excluir</button></div>
-                </div>
-            `;
-        });
-
-        container.innerHTML = html;
-
-        document.querySelectorAll('.evento-card').forEach(card => {
-
-            card.addEventListener('click', () => {
-
-                const id = card.dataset.id;
-
-                const evento = eventosOrdenados.find(
-                    e => String(e.id) === String(id)
-                );
-
-                if (!evento) return;
-
-                const dataFormatada =
-                    `${String(dia).padStart(2,'0')}/${String(mes + 1).padStart(2,'0')}/${ano}`;
-
-                abrirModal({
-                    titulo: evento.titulo,
-                    data: dataFormatada,
-                    horario: evento.horario,
-                    tipo: tipoMap[evento.tipo] || '🎭 Cultural',
-                    descricao: evento.descricao,
-                    linkIngressos: evento.linkIngressos,
-                    imagemUrl: evento.imagemUrl
-                });
-            });
-        });
-
-        document.querySelectorAll('.btn-editar').forEach(btn=>{btn.addEventListener('click',(ev)=>{ev.stopPropagation();const id=btn.dataset.id;const evento=eventosOrdenados.find(e=>String(e.id)===String(id));if(!evento)return;localStorage.setItem('eventoEditando',JSON.stringify(evento));localStorage.setItem('dataSelecionada',JSON.stringify({ano:evento.ano,mes:evento.mes,dia:evento.dia,id:evento.id}));window.location.href='formulario.html';});});
-        document.querySelectorAll('.btn-excluir').forEach(btn=>{btn.addEventListener('click',(ev)=>{ev.stopPropagation();const id=btn.dataset.id;if(!confirm('Deseja realmente excluir este evento?')) return;const all=JSON.parse(localStorage.getItem('todosEventos')||'{}');const key=`${ano}_${mes}_${dia}`;all[key]=(all[key]||[]).filter(e=>String(e.id)!==String(id));localStorage.setItem('todosEventos',JSON.stringify(all));carregarEventos();});});
-
-    } catch (e) {
-        console.error('Erro ao carregar eventos:', e);
-
-        container.innerHTML = `
-            <div class="sem-eventos">
-                <p>⚠️ Erro ao carregar os eventos.</p>
-                <p style="margin-top: 1rem;">Tente novamente ou volte ao calendário.</p>
-            </div>
-        `;
+    if (!todos[chave].length) {
+      delete todos[chave];
     }
-}
+  });
+};
+const getEventosDaData = (todos, ano, mes, dia) => {
+  const chave = `${ano}_${mes}_${dia}`;
+  const dataAtual = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(dia).padStart(2, '0')}`;
+  const eventos = [...(todos[chave] || [])];
+  const ids = new Set(eventos.map(e => String(e.id)));
 
+  Object.values(todos).flat().forEach(e => {
+    const inicio = dataParaComparacao(e.dataInicioEvento || e.dataInicio);
+    const fim = dataParaComparacao(e.dataFimEvento || e.dataFim || e.dataInicioEvento || e.dataInicio);
 
-// ============================================================
-// MODAL
-// ============================================================
-
-function abrirModal(dados) {
-
-    document.getElementById('modalTitulo').textContent = dados.titulo || '';
-    document.getElementById('modalData').textContent = dados.data || '';
-    document.getElementById('modalHorario').textContent = dados.horario || 'Horário não definido';
-    document.getElementById('modalTipo').textContent = dados.tipo || '';
-
-    const descricaoLinha = document.getElementById('modalDescricaoLinha');
-    const descricaoEl = document.getElementById('modalDescricao');
-
-    if (dados.descricao && dados.descricao.trim()) {
-        descricaoEl.innerHTML = escapeHtml(dados.descricao).replace(/\n/g, '<br>');
-        descricaoLinha.style.display = 'flex';
-    } else {
-        descricaoLinha.style.display = 'none';
+    if (inicio && fim && dataAtual >= inicio && dataAtual <= fim && !ids.has(String(e.id))) {
+      eventos.push(e);
+      ids.add(String(e.id));
     }
+  });
 
-    const ingressosLinha = document.getElementById('modalIngressosLinha');
-    const ingressosEl = document.getElementById('modalIngressos');
+  return eventos;
+};
+const textoHorario = evento => (
+  `${evento.horarioInicio || evento.horario || 'Horário não definido'}${evento.horarioFim ? ` até ${evento.horarioFim}` : ''}`
+);
+const textoPeriodo = (evento, dataPadrao) => (
+  `${formatarData(evento.dataInicioEvento || evento.dataInicio || dataPadrao)} até ${formatarData(evento.dataFimEvento || evento.dataFim || dataPadrao)}`
+);
+const abrirModal = (evento, dataPadrao) => {
+  document.getElementById('modalTitulo').textContent = evento.titulo || '';
+  document.getElementById('modalData').textContent = textoPeriodo(evento, dataPadrao);
+  document.getElementById('modalHorario').textContent = textoHorario(evento);
+  document.getElementById('modalTipo').textContent = tipoMap[evento.tipo] || '🎭 Cultural';
 
-    if (dados.linkIngressos && dados.linkIngressos.trim()) {
-        ingressosEl.innerHTML = `
-            <a href="${dados.linkIngressos}" target="_blank" rel="noopener noreferrer">
-                ${dados.linkIngressos}
-            </a>
-        `;
-        ingressosLinha.style.display = 'flex';
-    } else {
-        ingressosLinha.style.display = 'none';
-    }
+  const descricaoLinha = document.getElementById('modalDescricaoLinha');
+  document.getElementById('modalDescricao').textContent = evento.descricao || '';
+  descricaoLinha.style.display = evento.descricao ? 'flex' : 'none';
 
-    const imagemLinha = document.getElementById('modalImagemLinha');
-    const imagemEl = document.getElementById('modalImagem');
+  const ingressosLinha = document.getElementById('modalIngressosLinha');
+  const ingressos = document.getElementById('modalIngressos');
+  ingressosLinha.style.display = evento.linkIngressos ? 'flex' : 'none';
+  ingressos.innerHTML = evento.linkIngressos
+    ? `<a class="modal-link" href="${evento.linkIngressos}" target="_blank" rel="noopener noreferrer">${evento.linkIngressos}</a>`
+    : '';
 
-    if (dados.imagemUrl && dados.imagemUrl.trim()) {
-        imagemEl.innerHTML = `
-            <img src="${dados.imagemUrl}" class="modal-imagem"
-                 onerror="this.style.display='none'">
-        `;
-        imagemLinha.style.display = 'flex';
-    } else {
-        imagemLinha.style.display = 'none';
-    }
+  const imagemLinha = document.getElementById('modalImagemLinha');
+  const imagem = document.getElementById('modalImagem');
+  imagemLinha.style.display = evento.imagemUrl ? 'flex' : 'none';
+  imagem.innerHTML = evento.imagemUrl
+    ? `<img src="${evento.imagemUrl}" class="modal-imagem" alt="Folder de divulgação">`
+    : '';
 
-    document.getElementById('eventoModal').style.display = 'flex';
-}
+  document.getElementById('eventoModal').style.display = 'flex';
+};
+const fecharModal = () => {
+  document.getElementById('eventoModal').style.display = 'none';
+};
+const container = document.getElementById('eventosContainer'),
+  dataInfo = document.getElementById('dataInfo');
 
-function fecharModal() {
-    document.getElementById('eventoModal').style.display = 'none';
-}
+if (!dataSel) {
+  container.innerHTML = '<div class="sem-eventos"><p>📭 Nenhum evento selecionado.</p></div>';
+  dataInfo.textContent = '📅 Nenhum evento carregado';
+} else {
+  const { ano, mes, dia } = dataSel,
+    chave = `${ano}_${mes}_${dia}`;
+  const todosEventos = JSON.parse(localStorage.getItem('todosEventos') || '{}');
+  const eventos = getEventosDaData(todosEventos, ano, mes, dia)
+    .sort((a, b) => (a.horarioInicio || a.horario || '').localeCompare(b.horarioInicio || b.horario || ''));
+  const d = `${String(dia).padStart(2, '0')}-${String(mes + 1).padStart(2, '0')}-${ano}`;
 
+  dataInfo.textContent = `📅 ${d}`;
+  localStorage.setItem('dataSelecionada', JSON.stringify({ ano, mes, dia }));
 
-// ============================================================
-// HELPERS
-// ============================================================
+  container.innerHTML = eventos.length
+    ? eventos
+      .map(e => (
+        `<div class="evento-card" data-id="${e.id}">` +
+        `<div class="evento-titulo">${e.titulo}</div>` +
+        `<div class="evento-tipo">${tipoMap[e.tipo] || '🎭 Cultural'}</div>` +
+        `<div class="evento-horario">⏰ ${textoHorario(e)}</div>` +
+        `<div class="evento-horario">📆 ${textoPeriodo(e, d)}</div>` +
+        (isAdmin ? '<div style="margin-top:8px;display:flex;gap:8px;">' : '') +
+        (isAdmin ? `<button class="btn btn-secondary btn-editar" data-id="${e.id}">✏️ Editar</button>` : '') +
+        (isAdmin ? `<button class="btn btn-danger btn-excluir" data-id="${e.id}">🗑️ Excluir</button>` : '') +
+        (isAdmin ? '</div>' : '') +
+        '</div>'
+      ))
+      .join('')
+    : '<div class="sem-eventos"><p>📭 Nenhum evento registrado para esta data.</p></div>';
 
-function escapeHtml(text) {
-    if (!text) return '';
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
+  document.getElementById('btnRegistrarAqui')?.addEventListener(
+    'click',
+    () => location.href = 'formulario.html'
+  );
 
-function voltarCalendario() {
-    window.location.href = 'index.html';
-}
+  document.querySelectorAll('.evento-card').forEach(card => {
+    card.onclick = () => {
+      const evento = eventos.find(x => String(x.id) === String(card.dataset.id));
+      if (evento) abrirModal(evento, d);
+    };
+  });
 
-function registrarNovoEvento() {
+  if (isAdmin) {
+    document.querySelectorAll('.btn-editar').forEach(btn => btn.onclick = e => {
+      e.stopPropagation();
 
-    const eventosData = localStorage.getItem('eventosSelecionados');
-
-    if (eventosData) {
-        try {
-            const { ano, mes, dia } = JSON.parse(eventosData);
-
-            localStorage.setItem(
-                'dataSelecionada',
-                JSON.stringify({ ano, mes, dia })
-            );
-
-        } catch {}
-    }
-
-    window.location.href = 'formulario.html';
-}
-
-
-// ============================================================
-// INIT 
-// ============================================================
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    carregarEventos();
-
-    document.getElementById('btnVoltar')?.addEventListener('click', voltarCalendario);
-    document.getElementById('btnRegistrar')?.addEventListener('click', registrarNovoEvento);
-
-    document.querySelector('.modal-fechar')?.addEventListener('click', fecharModal);
-    document.querySelector('.modal-fechar-btn')?.addEventListener('click', fecharModal);
-
-    const modal = document.getElementById('eventoModal');
-
-    modal?.addEventListener('click', (e) => {
-        if (e.target === modal) fecharModal();
+      const evento = eventos.find(x => String(x.id) === btn.dataset.id);
+      localStorage.setItem('eventoEditando', JSON.stringify(evento));
+      location.href = 'formulario.html';
     });
 
-    
-});
+    document.querySelectorAll('.btn-excluir').forEach(btn => btn.onclick = e => {
+      e.stopPropagation();
+
+      if (!confirm('Deseja realmente excluir este evento?')) return;
+
+      const all = JSON.parse(localStorage.getItem('todosEventos') || '{}');
+      removerEventoDeTodasAsDatas(all, btn.dataset.id);
+      localStorage.setItem('todosEventos', JSON.stringify(all));
+      location.reload();
+    });
+  }
+}
+
+document.getElementById('btnVoltar').onclick = () => location.href = 'index.html';
+document.getElementById('btnRegistrar').onclick = () => location.href = 'formulario.html';
+document.querySelector('.modal-fechar').onclick = fecharModal;
+document.querySelector('.modal-fechar-btn').onclick = fecharModal;
+document.getElementById('eventoModal').onclick = e => {
+  if (e.target.id === 'eventoModal') fecharModal();
+};

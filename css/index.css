@@ -71,7 +71,7 @@ th, td {
     vertical-align: top;
     width: 14.28%;
     min-width: 80px;
-    height: 100px;
+    height: 120px;
     cursor: pointer;
     transition: background 0.1s;
 }
@@ -103,6 +103,25 @@ td:hover {
     border-radius: 30px;
 }
 
+.event-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    max-height: 70px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+}
+
+.event-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.event-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+}
+
 .today .day-number {
     background: #f7b32b;
     color: white;
@@ -124,8 +143,7 @@ td:hover {
     font-size: 9px;
     padding: 2px 5px;
     border-radius: 10px;
-    display: inline-block;
-    margin-top: 3px;
+    display: block;
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -220,7 +238,7 @@ h2 {
 @media (max-width: 768px) {
     th, td {
         min-width: 60px;
-        height: 80px;
+        height: 100px;
         font-size: 0.75rem;
         padding: 5px 3px;
     }
@@ -232,8 +250,10 @@ h2 {
     }
     .event-badge {
         font-size: 7px;
-        white-space: normal;
-        word-break: break-word;
+    }
+    .event-list {
+        max-height: 62px;
+        gap: 3px;
     }
     .controls {
         justify-content: center;
@@ -245,7 +265,7 @@ h2 {
         font-size: 0.7rem;
     }
     td {
-        height: 70px;
+        height: 90px;
     }
     .evento-item {
         padding: 8px 12px;
@@ -275,7 +295,7 @@ h2 {
     vertical-align: top;
     width: 14.28%;
     min-width: 80px;
-    height: 100px;
+    height: 120px;
     cursor: pointer;
     transition: background 0.1s;
 }
@@ -317,14 +337,23 @@ h2 {
     border-radius: 30px;
 }
 
+.calendario-tabela .event-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    max-height: 70px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 2px;
+}
+
 .calendario-tabela .event-badge {
     background: #e26d5c;
     color: white;
     font-size: 9px;
     padding: 2px 5px;
     border-radius: 10px;
-    display: inline-block;
-    margin-top: 3px;
+    display: block;
     max-width: 100%;
     white-space: nowrap;
     overflow: hidden;
@@ -345,7 +374,7 @@ h2 {
     .calendario-tabela th,
     .calendario-tabela td {
         min-width: 60px;
-        height: 80px;
+        height: 100px;
         font-size: 0.75rem;
         padding: 5px 3px;
     }
@@ -359,8 +388,54 @@ h2 {
     
     .calendario-tabela .event-badge {
         font-size: 7px;
-        white-space: normal;
-        word-break: break-word;
+    }
+
+    .calendario-tabela .event-list {
+        max-height: 62px;
+        gap: 3px;
     }
 }
-.carousel-wrapper{max-width:760px;margin:0 auto 1.5rem;text-align:center}.carousel{position:relative}.carousel-slide{display:none;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:12px}.carousel-slide.active{display:block}.carousel-slide img{width:100%;max-height:280px;object-fit:cover;border-radius:12px}.carousel-controls{display:flex;justify-content:center;gap:8px;margin-top:8px}.carousel-controls button{border:none;background:#e26d5c;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer}
+.carousel-wrapper {
+    max-width: 760px;
+    margin: 0 auto 1.5rem;
+    text-align: center
+}
+
+.carousel {
+    position: relative
+}
+
+.carousel-slide {
+    display: none;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 12px
+}
+
+.carousel-slide.active {
+    display: block
+}
+
+.carousel-slide img {
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 12px
+}
+
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px
+}
+
+.carousel-controls button {
+    border: none;
+    background: #e26d5c;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer
+}

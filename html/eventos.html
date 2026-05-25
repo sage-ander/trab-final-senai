@@ -5,8 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eventos Culturais</title>
     <link rel="stylesheet" href="../css/eventos.css">
+    <style>
+        body:not(.perfil-admin) .btn-editar,
+        body:not(.perfil-admin) .btn-excluir {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
+    <script>
+        try {
+            const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+            document.body.classList.toggle('perfil-admin', usuarioLogado?.u === 'admin' && usuarioLogado?.r === 'admin');
+        } catch {}
+    </script>
     <div class="container">
         <div class="card">
             <div class="card-header">
@@ -74,6 +86,6 @@
         </div>
     </div>
 
-    <script src="../js/eventos.js"></script>
+    <script src="../js/eventos.js?v=5"></script>
 </body>
 </html>

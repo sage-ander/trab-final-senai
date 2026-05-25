@@ -6,32 +6,42 @@
     <title>Calendário Cultural da Unidade</title>
     
     <!-- CSS externo -->
-    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/index.css?v=2">
 </head>
 <body>
 
 <div class="container">
     <h1>📅 Calendário Cultural da Cidade</h1>
 
-    <div style="text-align:right; margin-bottom:10px;"><button id="logoutBtn" class="btn-registrar" style="padding:0.5rem 1rem;">Sair</button></div>
+    <div style="text-align:right; margin-bottom:10px;">
+        <button id="loginBtn" class="btn-registrar" style="padding:0.5rem 1rem;">Login</button>
+    </div>
 
+    <!--
     <section class="carousel-wrapper">
       <div class="carousel" id="eventCarousel">
         <div class="carousel-slide active">
           <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Igreja de São João del-Rei">
-          <h3>Festival de Inverno</h3><p>Programação cultural no centro histórico.</p>
+          <h3>Festival de Inverno</h3>
+          <p>Programação cultural no centro histórico.</p>
         </div>
         <div class="carousel-slide">
           <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Evento em São João del-Rei">
-          <h3>Sarau na Praça</h3><p>Música e poesia ao ar livre.</p>
+          <h3>Sarau na Praça</h3>
+          <p>Música e poesia ao ar livre.</p>
         </div>
         <div class="carousel-slide">
           <img src="../assets/igreja-sao-joao-del-rei.svg" alt="Evento noturno">
-          <h3>Noite Cultural</h3><p>Artes, feira e gastronomia local.</p>
+          <h3>Noite Cultural</h3>
+          <p>Artes, feira e gastronomia local.</p>
         </div>
       </div>
-      <div class="carousel-controls"><button id="prevSlide">◀</button><button id="nextSlide">▶</button></div>
+      <div class="carousel-controls">
+        <button id="prevSlide">◀</button>
+        <button id="nextSlide">▶</button>
+      </div>
     </section>
+    -->
 
     <div class="controls">
         <div class="control-group">
@@ -82,7 +92,11 @@
     <div id="eventosProximosContainer"></div>
 
     <div style="margin-top: 20px; text-align: center;">
-        <button id="registrarEventoBtn" class="btn-registrar" style="padding: 0.8rem 2rem; font-size: 1rem;">📝 Quer registrar seu evento? Clique aqui</button>
+        <button
+            id="registrarEventoBtn"
+            class="btn-registrar"
+            style="padding: 0.8rem 2rem; font-size: 1rem;"
+        >📝 Quer registrar seu evento? Clique aqui</button>
     </div>
 
     <footer>
@@ -90,7 +104,7 @@
     </footer>
 </div>
 
-<script src="../js/script.js"></script>
+<script src="../js/script.js?v=4"></script>
 
 </body>
 </html>

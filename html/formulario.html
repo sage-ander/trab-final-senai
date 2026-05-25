@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Novo Evento</title>
-    <link rel="stylesheet" href="../css/formulario.css">
+    <link rel="stylesheet" href="../css/formulario.css?v=2">
 </head>
 <body>
     <div class="container">
@@ -22,8 +22,14 @@
                         <!-- Título -->
                         <div class="form-group">
                             <label class="required">📌 Título do Evento</label>
-                            <input type="text" id="titulo" class="form-control" placeholder="Ex: Sarau de Poesias, Festival" required>
-                            <div class="error-message" id="errorTitulo">O título é obrigatório</div>
+                            <input
+                                type="text"
+                                id="titulo"
+                                class="form-control"
+                                placeholder="Ex: Sarau de Poesias, Festival"
+                                required
+                            >
+                            
                         </div>
                         
                         <!-- Tipo -->
@@ -41,51 +47,59 @@
                             </select>
                         </div>
                         
-                        <!-- Horário -->
-                        <div class="form-group">
-                            <label>⏰ Horário do Evento</label>
-                            <input type="time" id="horario" class="form-control">
-                            <small style="color: #666;">Ex: 19:00, 14:30</small>
-                        </div>
-                        
                         <!-- Descrição -->
                         <div class="form-group">
                             <label>📝 Descrição do Evento</label>
-                            <textarea id="descricao" class="form-control" rows="4" placeholder="Descreva o evento, local, atrações..."></textarea>
+                            <textarea
+                                id="descricao"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Descreva o evento, local, atrações..."
+                            ></textarea>
                         </div>
                         
                         <!-- Link Ingressos -->
                         <div class="form-group">
                             <label>🎟️ Link para Compra de Ingressos</label>
                             <input type="url" id="linkIngressos" class="form-control" placeholder="https://...">
-                            <div class="error-message" id="errorLink">Insira uma URL válida</div>
+                            
                         </div>
                         
-                        <!-- Data de início -->
+                        <!-- Data de início do evento -->
                         <div class="form-group">
-                            <label class="required">📅 Data de início</label>
-                            <input type="date" id="dataInicio" class="form-control" required>
+                            <label class="required">📅 Data de início do evento</label>
+                            <input type="date" id="dataInicioEvento" class="form-control" required>
                         </div>
 
-                        <!-- Data de término -->
+                        <!-- Horário de início -->
                         <div class="form-group">
-                            <label class="required">📅 Data de término</label>
-                            <input type="date" id="dataFim" class="form-control" required>
-                            <div class="error-message" id="errorDataFim">A data de término não pode ser menor que a data de início</div>
+                            <label>⏰ Horário de início</label>
+                            <input type="time" id="horarioInicio" class="form-control">
+                            <small style="color: #666;">Ex: 19:00, 14:30</small>
                         </div>
 
-<!-- Data -->
+                        <!-- Data de fim do evento -->
                         <div class="form-group">
-                            <label>📅 Data do Evento</label>
-                            <input type="date" id="dataEvento" class="form-control">
-                            <small style="color: #666;">Selecione a data do evento. Se não escolher, usará a data atual.</small>
+                            <label class="required">📅 Data de fim do evento</label>
+                            <input type="date" id="dataFimEvento" class="form-control" required>
+                            <div
+                                class="error-message"
+                                id="errorDataFim"
+                            >A data/hora de fim não pode ser menor que a data/hora de início</div>
                         </div>
-                        
-                        <!-- Imagem com Drag and Drop -->
+
+                        <!-- Horário de fim -->
                         <div class="form-group">
-                            <label>🖼️ Imagem / Folder de Divulgação</label>
+                            <label>⏰ Horário de fim</label>
+                            <input type="time" id="horarioFim" class="form-control">
+                            <small style="color: #666;">Ex: 22:00, 17:30</small>
+                        </div>
+
+                        <!-- Folder de divulgação -->
+                        <div class="form-group">
+                            <label>🖼️ Folder de divulgação</label>
                             <div id="dropArea" class="drop-area">
-                                <p>📸 Arraste e solte uma imagem aqui ou clique para selecionar</p>
+                                <p>Arraste e solte uma imagem aqui ou clique em procurar</p>
                                 <input type="file" id="imagem" accept="image/*" style="display: none;">
                                 <button type="button" id="btnProcurar" class="btn btn-secondary">Procurar...</button>
                                 <span id="nomeArquivo" style="margin-left: 10px;">Nenhum arquivo selecionado.</span>
@@ -93,8 +107,8 @@
                             <div id="previewContainer" class="image-preview">
                                 <img id="previewImg" src="" alt="Pré-visualização">
                                 <div class="image-preview-buttons">
-                                    <button type="button" id="btnAlterar" class="btn btn-secondary">🔄 Alterar imagem</button>
-                                    <button type="button" id="btnRemover" class="btn btn-danger">🗑️ Remover imagem</button>
+                                    <button type="button" id="btnAlterar" class="btn btn-secondary">Alterar imagem</button>
+                                    <button type="button" id="btnRemover" class="btn btn-danger">Remover imagem</button>
                                 </div>
                             </div>
                         </div>
@@ -102,7 +116,11 @@
                         <!-- Botões -->
                         <div class="form-buttons">
                             <button type="submit" class="btn btn-primary">💾 Salvar Evento</button>
-                            <button type="button" id="btnVoltar" class="btn btn-secondary">← Voltar ao Calendário</button>
+                            <button
+                                type="button"
+                                id="btnVoltar"
+                                class="btn btn-secondary"
+                            >← Voltar ao Calendário</button>
                         </div>
                     </form>
                 </div>
