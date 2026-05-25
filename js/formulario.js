@@ -1,7 +1,6 @@
 const form = document.getElementById('eventoForm');
 const titulo = document.getElementById('titulo');
 const tipo = document.getElementById('tipo');
-<<<<<<< HEAD
 const horarioInicio = document.getElementById('horarioInicio');
 const horarioFim = document.getElementById('horarioFim');
 const descricao = document.getElementById('descricao');
@@ -71,23 +70,12 @@ const carregarImagem = arquivo => {
   reader.readAsDataURL(arquivo);
 };
 
-=======
-const horario = document.getElementById('horario');
-const descricao = document.getElementById('descricao');
-const linkIngressos = document.getElementById('linkIngressos');
-const dataEvento = document.getElementById('dataEvento');
-const dataInicio = document.getElementById('dataInicio');
-const dataFim = document.getElementById('dataFim');
-const erroDataFim = document.getElementById('errorDataFim');
-
->>>>>>> 49b53805ee6ed8232fa735f62524a7913a1cde56
 document.getElementById('btnVoltar').onclick = () => location.href = 'index.html';
 const baseData = JSON.parse(
   localStorage.getItem('dataSelecionada') || localStorage.getItem('eventosSelecionados') || 'null'
 );
 
 if (baseData) {
-<<<<<<< HEAD
   const dataSelecionada = `${baseData.ano}-${String(baseData.mes + 1).padStart(2, '0')}-${String(baseData.dia).padStart(2, '0')}`;
   dataInicioEvento.value = dataSelecionada;
   dataFimEvento.value = dataSelecionada;
@@ -151,36 +139,12 @@ form.addEventListener('submit', e => {
     horarioFim.value < horarioInicio.value;
 
   if (dataFimInvalida || horarioFimInvalido) {
-=======
-  dataEvento.value = `${baseData.ano}-${String(baseData.mes + 1).padStart(2, '0')}-${String(baseData.dia).padStart(2, '0')}`;
-}
-
-const editando = JSON.parse(localStorage.getItem('eventoEditando') || 'null');
-if (editando) {
-  titulo.value = editando.titulo || '';
-  tipo.value = editando.tipo || 'cultural';
-  horario.value = editando.horario || '';
-  descricao.value = editando.descricao || '';
-  linkIngressos.value = editando.linkIngressos || '';
-  dataInicio.value = editando.dataInicio || '';
-  dataFim.value = editando.dataFim || '';
-}
-
-form.addEventListener('submit', e => {
-  e.preventDefault();
-
-  if (dataFim.value < dataInicio.value) {
->>>>>>> 49b53805ee6ed8232fa735f62524a7913a1cde56
     return erroDataFim.style.display = 'block';
   }
 
   erroDataFim.style.display = 'none';
 
-<<<<<<< HEAD
   const [ano, mes, dia] = (dataInicioEvento.value || new Date().toISOString().slice(0, 10)).split('-').map(Number);
-=======
-  const [ano, mes, dia] = (dataEvento.value || new Date().toISOString().slice(0, 10)).split('-').map(Number);
->>>>>>> 49b53805ee6ed8232fa735f62524a7913a1cde56
   const evento = {
     id: editando?.id || Date.now(),
     ano,
@@ -188,7 +152,6 @@ form.addEventListener('submit', e => {
     dia,
     titulo: titulo.value.trim(),
     tipo: tipo.value,
-<<<<<<< HEAD
     horarioInicio: horarioInicio.value,
     horarioFim: horarioFim.value,
     descricao: descricao.value.trim(),
@@ -197,30 +160,14 @@ form.addEventListener('submit', e => {
     dataFimEvento: dataFimEvento.value,
     imagemUrl,
     imagemNome
-=======
-    horario: horario.value,
-    descricao: descricao.value.trim(),
-    linkIngressos: linkIngressos.value.trim(),
-    dataInicio: dataInicio.value,
-    dataFim: dataFim.value
->>>>>>> 49b53805ee6ed8232fa735f62524a7913a1cde56
   };
   const todos = JSON.parse(localStorage.getItem('todosEventos') || '{}');
 
   if (editando) {
-<<<<<<< HEAD
     removerEventoDeTodasAsDatas(todos, editando.id);
   }
 
   adicionarEventoNoPeriodo(todos, evento);
-=======
-    const chaveAntiga = `${editando.ano}_${editando.mes}_${editando.dia}`;
-    todos[chaveAntiga] = (todos[chaveAntiga] || []).filter(x => String(x.id) !== String(editando.id));
-  }
-
-  const chave = `${evento.ano}_${evento.mes}_${evento.dia}`;
-  todos[chave] = [...(todos[chave] || []), evento];
->>>>>>> 49b53805ee6ed8232fa735f62524a7913a1cde56
   localStorage.setItem('todosEventos', JSON.stringify(todos));
   localStorage.setItem(
     'dataSelecionada',
