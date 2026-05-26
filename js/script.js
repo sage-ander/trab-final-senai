@@ -224,3 +224,16 @@ document.getElementById('registrarEventoBtn').onclick = () => location.href = 'f
 
 window.addEventListener('pageshow', desenhar);
 desenhar();
+
+const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+
+const btnSair = document.getElementById('btnSair');
+
+if (usuarioLogado) {
+    btnSair.style.display = 'inline-block';
+
+    btnSair.onclick = () => {
+        localStorage.removeItem('usuarioLogado');
+        location.reload();
+    };
+}
