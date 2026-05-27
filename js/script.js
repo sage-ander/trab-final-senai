@@ -21,6 +21,32 @@ const mesSelect = document.getElementById('mesSelect'),
   calendarioBody = document.getElementById('calendarioBody'),
   eventosProximosContainer = document.getElementById('eventosProximosContainer');
 
+// --- CONTROLE DE AUTENTICAÇÃO DO ADMIN E BOTÃO SAIR ---
+const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+const isAdmin = usuarioLogado?.u === 'admin' && usuarioLogado?.r === 'admin';
+const btnSair = document.getElementById('btnSair');
+const loginBtn = document.getElementById('loginBtn');
+
+if (btnSair) {
+  if (isAdmin) {
+    // Se for administrador, exibe o botão Sair e oculta o botão de Login
+    btnSair.style.display = 'inline-block';
+    if (loginBtn) loginBtn.style.display = 'none';
+
+    btnSair.onclick = () => {
+      localStorage.removeItem('usuarioLogado');
+      localStorage.removeItem('eventoEditando');
+      alert('Sessão de Administrador encerrada com sucesso!');
+      location.reload(); // Recarrega para atualizar a interface e esconder o botão
+    };
+  } else {
+    // Caso não esteja logado como admin, garante que o botão Sair fica oculto
+    btnSair.style.display = 'none';
+    if (loginBtn) loginBtn.style.display = 'inline-block';
+  }
+}
+// -----------------------------------------------------
+
 const dataParaComparacao = data => {
   if (!data) return '';
 
@@ -208,32 +234,8 @@ anoSelect.onchange = () => (
   anoAtual = +anoSelect.value,
   desenhar()
 );
-document.getElementById('loginBtn').onclick = () => location.href = 'login.html';
+if (loginBtn) loginBtn.onclick = () => location.href = 'login.html';
 document.getElementById('registrarEventoBtn').onclick = () => location.href = 'formulario.html';
-
-// Carrossel comentado a pedido.
-// const slides = [...document.querySelectorAll('.carousel-slide')];
-// if (slides.length) {
-//   let i = 0,
-//     show = n => slides.forEach((s, idx) => s.classList.toggle('active', idx === n));
-//
-//   document.getElementById('nextSlide').onclick = () => show(i = (i + 1) % slides.length);
-//   document.getElementById('prevSlide').onclick = () => show(i = (i - 1 + slides.length) % slides.length);
-//   setInterval(() => show(i = (i + 1) % slides.length), 4000);
-// }
 
 window.addEventListener('pageshow', desenhar);
 desenhar();
-
-const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
-
-const btnSair = document.getElementById('btnSair');
-
-if (usuarioLogado) {
-    btnSair.style.display = 'inline-block';
-
-    btnSair.onclick = () => {
-        localStorage.removeItem('usuarioLogado');
-        location.reload();
-    };
-}

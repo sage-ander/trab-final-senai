@@ -145,12 +145,14 @@ form.addEventListener('submit', e => {
   erroDataFim.style.display = 'none';
 
   const [ano, mes, dia] = (dataInicioEvento.value || new Date().toISOString().slice(0, 10)).split('-').map(Number);
+  const nomeDoEvento = titulo.value.trim();
+
   const evento = {
     id: editando?.id || Date.now(),
     ano,
     mes: mes - 1,
     dia,
-    titulo: titulo.value.trim(),
+    titulo: nomeDoEvento,
     tipo: tipo.value,
     horarioInicio: horarioInicio.value,
     horarioFim: horarioFim.value,
@@ -163,11 +165,16 @@ form.addEventListener('submit', e => {
   };
   const todos = JSON.parse(localStorage.getItem('todosEventos') || '{}');
 
+  // Validação dinâmica do tipo de alerta com o nome do evento
   if (editando) {
     removerEventoDeTodasAsDatas(todos, editando.id);
+    adicionarEventoNoPeriodo(todos, evento);
+    alert(`Evento "${nomeDoEvento}" alterado com sucesso!`);
+  } else {
+    adicionarEventoNoPeriodo(todos, evento);
+    alert(`Evento "${nomeDoEvento}" cadastrado com sucesso!`);
   }
 
-  adicionarEventoNoPeriodo(todos, evento);
   localStorage.setItem('todosEventos', JSON.stringify(todos));
   localStorage.setItem(
     'dataSelecionada',
