@@ -1,27 +1,17 @@
 const hoje = new Date(),
   meses = [
-    'Janeiro',
-    'Fevereiro',
-    'Março',
-    'Abril',
-    'Maio',
-    'Junho',
-    'Julho',
-    'Agosto',
-    'Setembro',
-    'Outubro',
-    'Novembro',
-    'Dezembro'
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
-let anoAtual = hoje.getFullYear(),
-  mesAtual = hoje.getMonth();
+let anoAtual = hoje.getFullYear(), mesAtual = hoje.getMonth();
+
 const mesSelect = document.getElementById('mesSelect'),
   anoSelect = document.getElementById('anoSelect'),
   mesAnoTitulo = document.getElementById('mesAnoTitulo'),
   calendarioBody = document.getElementById('calendarioBody'),
   eventosProximosContainer = document.getElementById('eventosProximosContainer');
 
-// --- CONTROLE DE AUTENTICAÇÃO DO ADMIN E BOTÃO SAIR ---
+// --- AUTENTICAÇÃO E CONTROLE DE PERFIL ---
 const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
 const isAdmin = usuarioLogado?.u === 'admin' && usuarioLogado?.r === 'admin';
 const btnSair = document.getElementById('btnSair');
@@ -29,213 +19,199 @@ const loginBtn = document.getElementById('loginBtn');
 
 if (btnSair) {
   if (isAdmin) {
-    // Se for administrador, exibe o botão Sair e oculta o botão de Login
     btnSair.style.display = 'inline-block';
     if (loginBtn) loginBtn.style.display = 'none';
-
     btnSair.onclick = () => {
       localStorage.removeItem('usuarioLogado');
-      localStorage.removeItem('eventoEditando');
-      alert('Sessão de Administrador encerrada com sucesso!');
-      location.reload(); // Recarrega para atualizar a interface e esconder o botão
+      location.reload();
     };
   } else {
-    // Caso não esteja logado como admin, garante que o botão Sair fica oculto
     btnSair.style.display = 'none';
     if (loginBtn) loginBtn.style.display = 'inline-block';
   }
 }
-// -----------------------------------------------------
 
-const dataParaComparacao = data => {
-  if (!data) return '';
+// --- COMUNICAÇÃO COM O BANCO DE DADOS (API) ---
+let todosEventosBanco = []; // Armazena temporariamente os dados vindos do MySQL
 
-  if (data.includes('-')) {
-    const partes = data.split('-');
-
-    if (partes[0].length === 4) return data;
-
-    const [dia, mes, ano] = partes;
-    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-  }
-
-  if (data.includes('/')) {
-    const [dia, mes, ano] = data.split('/');
-    return `${ano}-${mes.padStart(2, '0')}-${dia.padStart(2, '0')}`;
-  }
-
-  return data;
-};
-const getEventos = (a, m, d) => {
-  const eventosObj = JSON.parse(localStorage.getItem('todosEventos') || '{}');
-  const chave = `${a}_${m}_${d}`;
-  const dataAtual = `${a}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-  const eventos = [...(eventosObj[chave] || [])];
-  const ids = new Set(eventos.map(e => String(e.id)));
-
-  Object.values(eventosObj).flat().forEach(e => {
-    const inicio = dataParaComparacao(e.dataInicioEvento || e.dataInicio);
-    const fim = dataParaComparacao(e.dataFimEvento || e.dataFim || e.dataInicioEvento || e.dataInicio);
-
-    if (inicio && fim && dataAtual >= inicio && dataAtual <= fim && !ids.has(String(e.id))) {
-      eventos.push(e);
-      ids.add(String(e.id));
-    }
-  });
-
-  return eventos;
-};
-const formatarDataProximos = (dia, mes, ano) => (
-  `${String(dia).padStart(2, '0')}-${String(mes).padStart(2, '0')}-${ano}`
-);
-const formatarDataSalva = data => {
-  if (!data) return '';
-
-  if (data.includes('-')) {
-    const partes = data.split('-');
-
-    if (partes[0].length === 4) {
-      const [ano, mes, dia] = partes;
-      return `${dia}-${mes}-${ano}`;
-    }
-
-    const [dia, mes, ano] = partes;
-    return `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${ano}`;
-  }
-
-  if (data.includes('/')) {
-    const [dia, mes, ano] = data.split('/');
-    return `${dia.padStart(2, '0')}-${mes.padStart(2, '0')}-${ano}`;
-  }
-
-  return data;
-};
-const setSelecionados = (ano, mes, dia, eventos, eventoUnico = false) => localStorage.setItem(
-  'eventosSelecionados',
-  JSON.stringify({ ano, mes, dia, eventos, eventoUnico })
-);
-
-mesSelect.value = mesAtual;
-for (let a = hoje.getFullYear(); a <= hoje.getFullYear() + 10; a++) {
-  anoSelect.innerHTML += `<option value="${a}" ${a === anoAtual ? 'selected' : ''}>${a}</option>`;
+/* FUNÇÃO PRINCIPAL: Faz uma requisição GET ao servidor PHP, busca todos os 
+  eventos cadastrados na tabela do MySQL e ordena o início do calendário.
+*/
+function carregarEventosDoServidor() {
+  fetch('api/eventos.php')
+    .then(res => res.json())
+    .then(dados => {
+      if (dados.erro) {
+        console.log(dados.erro)
+        console.error("Erro na API:", dados.erro);
+        return;
+      }
+      todosEventosBanco = dados; // Salva a lista recebida
+      desenhar(); // Renderiza visualmente o calendário na tela
+    })
+    .catch(err => console.error("Erro de conexão com o servidor:", err));
 }
 
+/* FUNÇÃO PRINCIPAL: Varre o array obtido do banco de dados e retorna apenas os 
+  eventos que ocorrem ou passam pela data específica enviada por parâmetro.
+*/
+function getEventos(ano, mes, dia) {
+  const mesFormatado = String(mes + 1).padStart(2, '0');
+  const diaFormatado = String(dia).padStart(2, '0');
+  const dataString = `${ano}-${mesFormatado}-${diaFormatado}`;
+
+  return todosEventosBanco.filter(e => {
+    return dataString >= e.dataInicioEvento && dataString <= e.dataFimEvento;
+  });
+}
+
+/* FUNÇÃO PRINCIPAL: Mapeia e prepara todos os eventos recebidos do banco de dados 
+  para alimentar a lista lateral de próximos eventos na interface principal.
+*/
+function getTodosEventos() {
+  return todosEventosBanco.map(e => ({
+    ...e,
+    data: e.dataInicioEvento
+  }));
+}
+
+// --- CONFIGURAÇÃO E MONTAGEM DA INTERFACE (DOM) ---
+
+/* FUNÇÃO PRINCIPAL: Cria dinamicamente as opções do menu de seleção de anos 
+  e adiciona ouvintes de evento para atualizar o calendário ao mudar o mês/ano.
+*/
+function inicializarControles() {
+  for (let i = anoAtual - 5; i <= anoAtual + 5; i++) {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    if (i === anoAtual) opt.selected = true;
+    anoSelect.appendChild(opt);
+  }
+
+  mesSelect.addEventListener('change', () => {
+    mesAtual = parseInt(mesSelect.value);
+    desenhar();
+  });
+
+  anoSelect.addEventListener('change', () => {
+    anoAtual = parseInt(anoSelect.value);
+    desenhar();
+  });
+}
+
+/* FUNÇÃO PRINCIPAL: Grava no localStorage o dia em que o usuário clicou 
+  para que a página de detalhes (eventos.html) saiba qual dia renderizar.
+*/
+function setSelecionados(ano, mes, dia, eventos) {
+  localStorage.setItem('dataSelecionada', JSON.stringify({ ano, mes, dia }));
+}
+
+/* FUNÇÃO PRINCIPAL: Reconverte strings de data vindas do MySQL ("YYYY-MM-DD") 
+  para exibição amigável no formato brasileiro ("DD/MM/YYYY").
+*/
+function formatarDataSalva(str) {
+  if (!str) return '';
+  const [ano, mes, dia] = str.split('-');
+  return `${dia}/${mes}/${ano}`;
+}
+
+/* FUNÇÃO PRINCIPAL: Gera dinamicamente a tabela HTML do calendário, calculando os dias do 
+  mês atual, preenchendo os espaços vazios e aplicando estilos nos dias que contêm eventos.
+*/
 function desenhar() {
-  mesAnoTitulo.textContent = `${meses[mesAtual].toLowerCase()} ${anoAtual}`;
-  const inicio = new Date(anoAtual, mesAtual, 1).getDay(),
-    total = new Date(anoAtual, mesAtual + 1, 0).getDate(),
-    prevTotal = new Date(anoAtual, mesAtual, 0).getDate();
-  let html = '',
-    count = 0;
+  mesAnoTitulo.textContent = `${meses[mesAtual]} ${anoAtual}`;
+  mesSelect.value = mesAtual;
+  anoSelect.value = anoAtual;
 
-  for (let i = inicio - 1; i >= 0; i--) {
-    html += `<td class="other-month"><div class="day-number">${prevTotal - i}</div></td>`;
-    count++;
+  const primeiroDia = new Date(anoAtual, mesAtual, 1).getDay();
+  const totalDias = new Date(anoAtual, mesAtual + 1, 0).getDate();
+
+  calendarioBody.innerHTML = '';
+  let linha = document.createElement('tr');
+
+  for (let i = 0; i < primeiroDia; i++) {
+    linha.appendChild(document.createElement('td'));
   }
 
-  const h = new Date(),
-    isMes = h.getFullYear() === anoAtual && h.getMonth() === mesAtual;
-
-  for (let dia = 1; dia <= total; dia++) {
-    const eventos = getEventos(anoAtual, mesAtual, dia)
-      .sort((a, b) => (a.horarioInicio || a.horario || '').localeCompare(b.horarioInicio || b.horario || ''));
-    const badges = eventos.length
-      ? '<div class="event-list">' + eventos
-      .map(e => (
-        `<div class="event-badge" onclick="event.stopPropagation();verEventos(${anoAtual},${mesAtual},${dia})">` +
-        `${e.titulo.substring(0, 12)}</div>`
-      ))
-      .join('') + '</div>'
-      : '';
-
-    html += (
-      `<td class="${isMes && h.getDate() === dia ? 'today' : ''}" onclick="verEventos(${anoAtual},${mesAtual},${dia})">` +
-      `<div class="day-number">${dia}</div>` +
-      `${badges}</td>`
-    );
-
-    if (++count % 7 === 0 && dia !== total) {
-      html += '</tr><tr>';
+  for (let dia = 1; dia <= totalDias; dia++) {
+    if (linha.children.length === 7) {
+      calendarioBody.appendChild(linha);
+      linha = document.createElement('tr');
     }
-  }
 
-  const faltam = 7 - (count % 7);
+    const td = document.createElement('td');
+    td.className = 'dia-atual';
+    
+    const dDiv = document.createElement('div');
+    dDiv.className = 'dia-numero';
+    dDiv.textContent = dia;
+    td.appendChild(dDiv);
 
-  if (faltam < 7) {
-    for (let dia = 1; dia <= faltam; dia++) {
-      html += `<td class="other-month"><div class="day-number">${dia}</div></td>`;
+    const listaEventos = getEventos(anoAtual, mesAtual, dia);
+    if (listaEventos.length > 0) {
+      td.classList.add('tem-evento');
+      const eDiv = document.createElement('div');
+      eDiv.className = 'evento-marcador';
+      eDiv.textContent = `${listaEventos.length} evento${listaEventos.length > 1 ? 's' : ''}`;
+      td.appendChild(eDiv);
     }
+
+    td.onclick = () => verEventos(anoAtual, mesAtual, dia);
+    linha.appendChild(td);
   }
 
-  calendarioBody.innerHTML = `<tr>${html}</tr>`;
-
-  const eventosObj = JSON.parse(localStorage.getItem('todosEventos') || '{}');
-  let lista = [];
-  const eventosAdicionados = new Set();
-
-  for (let i = 0; i < 30; i++) {
-    const d = new Date(anoAtual, mesAtual, 1 + i);
-
-    if (d.getMonth() > mesAtual + 1) break;
-
-    const chave = `${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
-    (eventosObj[chave] || []).forEach(e => {
-      if (eventosAdicionados.has(String(e.id))) return;
-
-      eventosAdicionados.add(String(e.id));
-      lista.push({
-        ...e,
-        data: formatarDataProximos(d.getDate(), d.getMonth() + 1, d.getFullYear()),
-        dataOrdenacao: e.dataInicioEvento || `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-      });
-    });
+  if (linha.children.length > 0) {
+    while (linha.children.length < 7) {
+      linha.appendChild(document.createElement('td'));
+    }
+    calendarioBody.appendChild(linha);
   }
 
-  lista.sort((a, b) => (
-    new Date(a.dataOrdenacao) - new Date(b.dataOrdenacao)
-  ));
-  eventosProximosContainer.innerHTML = `<div class="card-eventos"><h3>📅 Próximos Eventos</h3>${(
+  desenharListaEventos();
+}
+
+/* FUNÇÃO PRINCIPAL: Monta e renderiza a seção inferior/lateral de "Próximos Eventos", 
+  mostrando de forma cronológica até 5 atividades que estão salvas no banco.
+*/
+function desenharListaEventos() {
+  if (!eventosProximosContainer) return;
+  const lista = getTodosEventos();
+
+  eventosProximosContainer.innerHTML = `<div class=\"card-eventos\"><h3>📅 Próximos Eventos</h3>${(
     lista
       .slice(0, 5)
       .map(e => (
         `<div class="evento-item" onclick="verEventoPorData('${e.data}','${e.id}')">` +
-        `<div class="evento-data">📅 ${formatarDataSalva(e.dataInicioEvento || e.data)} até ${formatarDataSalva(e.dataFimEvento || e.data)}</div>` +
+        `<div class="evento-data">📅 ${formatarDataSalva(e.dataInicioEvento)} até ${formatarDataSalva(e.dataFimEvento)}</div>` +
         `<strong>${e.titulo}</strong>` +
-        `<div>⏰ ${e.horarioInicio || e.horario || 'Horário não definido'}${e.horarioFim ? ` até ${e.horarioFim}` : ''}</div>` +
+        `<div>⏰ ${e.horarioInicio || 'Horário não definido'}${e.horarioFim ? ` até ${e.horarioFim}` : ''}</div>` +
         '</div>'
       ))
       .join('')
   ) || '<p>Nenhum evento próximo registrado.</p>'}</div>`;
 }
 
+// --- REDIRECIONAMENTOS DE TELAS ---
 window.verEventos = (ano, mes, dia) => {
   setSelecionados(ano, mes, dia, getEventos(ano, mes, dia));
   location.href = 'eventos.html';
 };
-window.verEventoPorData = (data, id) => {
-  const [dia, mes, ano] = data.split(/[-/]/).map(Number);
 
-  setSelecionados(
-    ano,
-    mes - 1,
-    dia,
-    getEventos(ano, mes - 1, dia).filter(e => String(e.id) === String(id)),
-    true
-  );
+window.verEventoPorData = (data, id) => {
+  const [ano, mes, dia] = data.split('-').map(Number);
+  setSelecionados(ano, mes - 1, dia, []);
   location.href = 'eventos.html';
 };
-window.verEvento = window.verEventos;
 
-mesSelect.onchange = () => (
-  mesAtual = +mesSelect.value,
-  desenhar()
-);
-anoSelect.onchange = () => (
-  anoAtual = +anoSelect.value,
-  desenhar()
-);
-if (loginBtn) loginBtn.onclick = () => location.href = 'login.html';
-document.getElementById('registrarEventoBtn').onclick = () => location.href = 'formulario.html';
+const registrarEventoBtn = document.getElementById('registrarEventoBtn');
+if (registrarEventoBtn) {
+  registrarEventoBtn.onclick = () => {
+    localStorage.removeItem('eventoEditando'); // Garante que abre limpo para cadastro
+    location.href = 'formulario.html';
+  };
+}
 
-window.addEventListener('pageshow', desenhar);
-desenhar();
+// --- INICIALIZAÇÃO AUTOMÁTICA DO SISTEMA ---
+inicializarControles();
+carregarEventosDoServidor(); // Primeiro busca na API, depois desenha tudo
