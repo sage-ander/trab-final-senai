@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventos Culturais</title>
+    <link rel="stylesheet" href="../css/eventos.css">
+    <style>
+        body:not(.perfil-admin) .btn-editar,
+        body:not(.perfil-admin) .btn-excluir {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        try {
+            const usuarioLogado = JSON.parse(localStorage.getItem('usuarioLogado') || 'null');
+            document.body.classList.toggle('perfil-admin', usuarioLogado?.u === 'admin' && usuarioLogado?.r === 'admin');
+        } catch {}
+    </script>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h2>🎭 Eventos Culturais</h2>
+            </div>
+            <div class="card-body">
+                <div id="dataInfo" class="data-info">
+                    📅 Carregando...
+                </div>
+                
+                <div id="eventosContainer" class="eventos-container">
+                    <div class="sem-eventos">
+                        <p>📭 Nenhum evento selecionado.</p>
+                        <p>Volte ao calendário e clique em um evento para ver os detalhes.</p>
+                    </div>
+                </div>
+                
+                <div class="botoes-container">
+                    <button id="btnVoltar" class="btn btn-secondary">
+                        ← Voltar ao Calendário
+                    </button>
+                    <button id="btnRegistrar" class="btn btn-primary">
+                        + Registrar novo evento nesta data
+                    </button>
+                </div>
+            </div>
+            <div class="card-footer">
+                Calendário Cultural da Unidade - Gerência de Eventos
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DIRETO NO HTML (sem precisar de fetch) -->
+    <div id="eventoModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="modal-fechar">&times;</span>
+            <div class="modal-titulo" id="modalTitulo"></div>
+            <div class="modal-info">
+                <div class="modal-linha">
+                    <span class="modal-label">📅 Data:</span>
+                    <span class="modal-valor" id="modalData"></span>
+                </div>
+                <div class="modal-linha">
+                    <span class="modal-label">⏰ Horário:</span>
+                    <span class="modal-valor" id="modalHorario"></span>
+                </div>
+                <div class="modal-linha">
+                    <span class="modal-label">🎭 Tipo:</span>
+                    <span class="modal-valor" id="modalTipo"></span>
+                </div>
+                <div class="modal-linha" id="modalDescricaoLinha" style="display: none;">
+                    <span class="modal-label">📝 Descrição:</span>
+                    <div class="modal-valor modal-descricao" id="modalDescricao"></div>
+                </div>
+                <div class="modal-linha" id="modalIngressosLinha" style="display: none;">
+                    <span class="modal-label">🎟️ Ingressos:</span>
+                    <div class="modal-valor" id="modalIngressos"></div>
+                </div>
+                <div class="modal-linha" id="modalImagemLinha" style="display: none;">
+                    <span class="modal-label">🖼️ Folder:</span>
+                    <div class="modal-valor" id="modalImagem"></div>
+                </div>
+            </div>
+            <button class="modal-fechar-btn">Fechar</button>
+        </div>
+    </div>
+
+    <script src="../js/eventos.js"></script>
+</body>
+</html>

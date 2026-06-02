@@ -1,0 +1,10 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 700'>
+<rect width='1200' height='700' fill='#dbeafe'/>
+<rect y='450' width='1200' height='250' fill='#a7f3d0'/>
+<rect x='460' y='220' width='280' height='280' fill='#fef3c7' stroke='#92400e' stroke-width='6'/>
+<polygon points='440,220 760,220 600,120' fill='#f59e0b'/>
+<rect x='575' y='310' width='50' height='190' fill='#92400e'/>
+<rect x='520' y='280' width='40' height='60' fill='#bfdbfe'/>
+<rect x='640' y='280' width='40' height='60' fill='#bfdbfe'/>
+<text x='600' y='620' text-anchor='middle' font-size='42' fill='#1f2937' font-family='Arial'>São João del-Rei</text>
+</svg>

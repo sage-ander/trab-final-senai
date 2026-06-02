@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Cultural da Cidade</title>
+    <link rel="stylesheet" href="../css/index.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>📅 Calendário Cultural da Cidade</h1>
+
+    <div class="top-buttons">
+
+        <button id="btnSair"
+                class="btn-registrar btn-topo"
+                style="display:none;">
+            Sair
+        </button>
+
+        <button id="loginBtn"
+                class="btn-registrar btn-topo">
+            Login
+        </button>
+
+    </div>
+
+    <div class="controls">
+
+        <div class="control-group">
+            <label for="mesSelect">Mês:</label>
+
+            <select id="mesSelect">
+                <option value="0">Janeiro</option>
+                <option value="1">Fevereiro</option>
+                <option value="2">Março</option>
+                <option value="3">Abril</option>
+                <option value="4" selected>Maio</option>
+                <option value="5">Junho</option>
+                <option value="6">Julho</option>
+                <option value="7">Agosto</option>
+                <option value="8">Setembro</option>
+                <option value="9">Outubro</option>
+                <option value="10">Novembro</option>
+                <option value="11">Dezembro</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="anoSelect">Ano:</label>
+            <select id="anoSelect"></select>
+        </div>
+
+    </div>
+
+    <h2 id="mesAnoTitulo">maio 2026</h2>
+
+    <div id="calendarioContainer">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Dom</th>
+                    <th>Seg</th>
+                    <th>Ter</th>
+                    <th>Qua</th>
+                    <th>Qui</th>
+                    <th>Sex</th>
+                    <th>Sáb</th>
+                </tr>
+            </thead>
+
+            <tbody id="calendarioBody"></tbody>
+
+        </table>
+
+    </div>
+
+    <div id="eventosProximosContainer"></div>
+
+    <div class="registrar-container">
+
+        <button
+            id="registrarEventoBtn"
+            class="btn-registrar registrar-btn">
+
+            📝 Quer registrar seu evento? Clique aqui
+
+        </button>
+
+    </div>
+
+    <footer>
+        Calendário Cultural da Cidade - Gerência de Eventos
+    </footer>
+
+</div>
+
+<script src="../js/script.js"></script>
+
+</body>
+</html>
